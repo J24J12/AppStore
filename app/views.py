@@ -21,6 +21,10 @@ def index(request):
     return render(request,'app/index.html',result_dict)
 
 # Create your views here.
+def bbqpit(request):
+    return render(request,'app/bbqpit.html')
+
+# Create your views here.
 def view(request, id):
     """Shows the main page"""
     

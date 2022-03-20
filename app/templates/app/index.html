@@ -1,33 +1,126 @@
 {% load static %}
 <html>
-<body>
-    <h2>Customers in the App Store</h2>
-    <img src="{% static 'app/images/nus.jpg' %}" width="10%"   alt="NUS logo"/><br/>
+  <head>
+    <link rel="preconnect" href="https://fonts.googleapis.com" />
+    <link rel="preconnect" href="https://fonts.gstatic.com" crossorigin />
+    <link
+      href="https://fonts.googleapis.com/css2?family=Poppins:wght@300;400;600&display=swap"
+      rel="stylesheet"
+    />
+    <link rel="stylesheet" href="../../static/css/main.css" />
+  </head>
+  <body>
+    <div>
+      <img
+        src="{% static 'app/images/banner.jpeg' %}"
+        width="100%"
+        height="50%"
+        style="object-fit: cover; filter: brightness(40%)"
+        alt="banner"
+      />
+      <div class="header-container">
+        <div class="header-text">Skyward Atlas</div>
+        <div class="header-body">Your one stop booking facility</div>
+      </div>
+    </div>
+    <br />
+    <div class="booking-header">Select your venue</div>
+    <div class="booking-container">
+      <a href="bbqpit" style="text-decoration: none; color: black">
+        <div class="booking-box">
+          <img
+            src="{% static 'app/images/bbqpit.jpeg' %}"
+            width="100%"
+            height="65%"
+            style="object-fit: cover"
+            alt="bbqpit"
+          />
+          <div class="booking-text">
+            <p class="booking-venue">BBQ Pit</p>
+            <p class="booking-description">Description here</p>
+          </div>
+        </div>
+      </a>
+      <a href="add" style="text-decoration: none; color: black">
+        <div class="booking-box">
+          <img
+            src="{% static 'app/images/tenniscourt.jpeg' %}"
+            width="100%"
+            height="65%"
+            style="object-fit: cover"
+            alt="tenniscourt"
+          />
+          <div class="booking-text">
+            <p class="booking-venue">Tennis Court</p>
+            <p class="booking-description">Description here</p>
+          </div>
+        </div>
+      </a>
+      <a href="add" style="text-decoration: none; color: black">
+        <div class="booking-box">
+          <img
+            src="{% static 'app/images/tabletennis.png' %}"
+            width="100%"
+            height="65%"
+            style="object-fit: cover"
+            alt="tabletennis"
+          />
+          <div class="booking-text">
+            <p class="booking-venue">Table Tennis</p>
+            <p class="booking-description">Description here</p>
+          </div>
+        </div>
+      </a>
+      <a href="add" style="text-decoration: none; color: black">
+        <div class="booking-box">
+          <img
+            src="{% static 'app/images/mph.jpeg' %}"
+            width="100%"
+            height="65%"
+            style="object-fit: cover"
+            alt="mph"
+          />
+          <div class="booking-text">
+            <p class="booking-venue">Multi-Purpose Hall</p>
+            <p class="booking-description">Description here</p>
+          </div>
+        </div>
+      </a>
+    </div>
+    <!-- <button>abc</button>
     <a href="add">New customer</a>
-    <br/><br/>
-    <table border=1>
-        <thead>
-            <th>ID</th>
-            <th>First Name</th>
-            <th>Last Name</th>
-            <th>Action</th>
-        </thead>
-        {% for cust in records %}
-        <tr>
-            <td> {{ cust.5 }} </td>
-            <td> {{ cust.0 }} </td>
-            <td> {{ cust.1 }} </td>
-            <td>
-                <a href="view/{{cust.5}}"><button>View</button></a> | 
-                <a href="edit/{{cust.5}}"><button>Edit</button></a>
-                | 
-                <form method="POST" style="display: inline;">
-                {% csrf_token %}
-                <input type="hidden" name="id" value="{{cust.5}}"/>
-                <button onclick="return confirm('Are you sure you want to delete {{cust.5}}?');" type="submit" name="action" value="delete">Delete</button> 
-              </form></td>
-        </tr>
-        {% endfor %}
-    </table>
-</body>
+    <br /><br /> -->
+    <!-- <table border="1">
+      <thead>
+        <th>ID</th>
+        <th>First Name</th>
+        <th>Last Name</th>
+        <th>Action</th>
+      </thead>
+      {% for cust in records %}
+      <tr>
+        <td>{{ cust.5 }}</td>
+        <td>{{ cust.0 }}</td>
+        <td>{{ cust.1 }}</td>
+        <td>
+          <a href="view/{{cust.5}}"><button>View</button></a> |
+          <a href="edit/{{cust.5}}"><button>Edit</button></a>
+          |
+          <form method="POST" style="display: inline">
+            {% csrf_token %}
+            <input type="hidden" name="id" value="{{cust.5}}" />
+            <button
+              onclick="return confirm('Are you sure you want to delete {{cust.5}}?');"
+              type="submit"
+              name="action"
+              value="delete"
+            >
+              Delete
+            </button>
+          </form>
+        </td>
+      </tr>
+      {% endfor %}
+    </table> -->
+  </body>
 </html>
