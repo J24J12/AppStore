@@ -24,24 +24,30 @@
       </div>
     </div>
     <br />
+    
     <div class="booking-header">Select your venue</div>
     <div class="booking-container">
-      <a href="bbqpit" style="text-decoration: none; color: black">
+    {% for venues in records %}
+      <a href="{{venues.2}}" style="text-decoration: none; color: black">
         <div class="booking-box">
+          {% with 'app/images/'|add:venues.2|add:'.jpeg' as image_static %}
           <img
-            src="{% static 'app/images/bbqpit.jpeg' %}"
+            src="{% static image_static %}"
             width="100%"
             height="65%"
             style="object-fit: cover"
-            alt="bbqpit"
+            alt="{{venues.2}}"
           />
+          {% endwith %}
           <div class="booking-text">
-            <p class="booking-venue">BBQ Pit</p>
-            <p class="booking-description">Description here</p>
+            <p class="booking-venue">{{venues.0}}</p>
+            <p class="booking-description">{{venues.1}}</p>
           </div>
         </div>
       </a>
-      <a href="add" style="text-decoration: none; color: black">
+      {% endfor %}
+      </div>
+      <!-- <a href="add" style="text-decoration: none; color: black">
         <div class="booking-box">
           <img
             src="{% static 'app/images/tenniscourt.jpeg' %}"
@@ -87,10 +93,10 @@
         </div>
       </a>
     </div>
-    <!-- <button>abc</button>
-    <a href="add">New customer</a>
-    <br /><br /> -->
-    <!-- <table border="1">
+    <button>abc</button> -->
+    <!-- <a href="add">New customer</a>
+    <br /><br /> 
+    <table border="1">
       <thead>
         <th>ID</th>
         <th>First Name</th>

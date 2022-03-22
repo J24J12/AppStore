@@ -30,8 +30,14 @@
           <th>Timings</th>
           <th>Availability</th>
         </thead>
+        {% for time in list %}
+        <tr>
+          <td>{{time.0}}</td>
+          <td>{{time.1}}</td>
+        </tr>
+        {% endfor %}
       </table>
-      <tr></tr>
+      
     </div>
   </body>
 </html>

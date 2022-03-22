@@ -13,16 +13,18 @@ def index(request):
 
     ## Use raw query to get all objects
     with connection.cursor() as cursor:
-        cursor.execute("SELECT * FROM customers ORDER BY customerid")
-        customers = cursor.fetchall()
+        cursor.execute("SELECT * FROM venues")
+        venues = cursor.fetchall()
+        print(venues)
 
-    result_dict = {'records': customers}
+    result_dict = {'records': venues}
 
     return render(request,'app/index.html',result_dict)
 
 # Create your views here.
 def bbqpit(request):
-    return render(request,'app/bbqpit.html')
+    list = {'list': [["abc", "def"]]}
+    return render(request,'app/bbqpit.html', list)
 
 # Create your views here.
 def view(request, id):
