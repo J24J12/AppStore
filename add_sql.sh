@@ -33,3 +33,4 @@ psql ${URI} -f sql/AppStoreSchema.sql
 psql ${URI} -f sql/AppStoreCustomers.sql
 psql ${URI} -f sql/AppStoreGames.sql
 psql ${URI} -f sql/AppStoreDownloads.sql
+psql ${URI} -f sql/app_assignment.sql
