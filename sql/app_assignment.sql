@@ -8,7 +8,7 @@ CREATE TABLE IF NOT EXISTS usertable (
 	isadmin BOOLEAN NOT NULL
 	);
 		
-CREATE TABLE bookings (
+CREATE TABLE IF NOT EXISTS bookings (
 	eventstartdate timestamp NOT NULL,
 	eventenddate timestamp NOT NULL,
 	venue VARCHAR(32) NOT NULL,
@@ -16,19 +16,10 @@ CREATE TABLE bookings (
 	isadmin VARCHAR(16) REFERENCES usertable(isadmin) ON UPDATE CASCADE ON DELETE CASCADE DEFERRABLE INITIALLY DEFERRED,
 	PRIMARY KEY (residentid, isadmin, venue));
 	
-CREATE TABLE venues (
+CREATE TABLE IF NOT EXISTS venues (
 	venue_name VARCHAR(64) NOT NULL,
 	description VARCHAR(64) NOT NULL,
 	image_path VARCHAR(64) NOT NULL);
 	
-DROP TABLE venues	
-
-DELETE FROM venues WHERE venue_name = 'BBQpit'
-
-INSERT INTO venues VALUES ('BBQ Pit', 'BBQ', 'bbqpit')
-
-INSERT INTO venues VALUES ('Tennis Court', 'Tennis', 'tenniscourt')
-
-
-SELECT *
-FROM venues
+INSERT INTO venues VALUES ('BBQ Pit', 'BBQ', 'bbqpit');
+INSERT INTO venues VALUES ('Tennis Court', 'Tennis', 'tenniscourt');
