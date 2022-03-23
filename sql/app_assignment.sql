@@ -27,3 +27,8 @@ CREATE TABLE IF NOT EXISTS bookings (
 	
 INSERT INTO venues VALUES ('BBQ Pit', 'BBQ', 'bbqpit');
 INSERT INTO venues VALUES ('Tennis Court', 'Tennis', 'tenniscourt');
+INSERT INTO venues VALUES ('Multi-Purpose Hall', 'MPH', 'mph');
+INSERT INTO venues VALUES ('Table Tennis', 'Ping Pong', 'tabletennis');
+
+INSERT INTO usertable VALUES ('first', 'user', 'email@email.com', '2010-10-10', '2022-10-10', 'unique_id', false);
+INSERT INTO bookings VALUES ('2022-02-02 20:00', '2022-02-02 21:00', 'BBQ Pit', 'unique_id');

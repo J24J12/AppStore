@@ -30,14 +30,17 @@
           <th>Timings</th>
           <th>Availability</th>
         </thead>
-        {% for time in list %}
+        {% for availtimes in available %}
         <tr>
-          <td>{{time.0}}</td>
-          <td>{{time.1}}</td>
+          <td>{{availtimes.0.time}} - {{availtimes.1.time}}</td>
+          {% if availtimes.2 %}
+          <td>Unavailable</td>
+          {% else %}
+          <td><a href="bbqpit">Available</a></td>
+          {% endif %}
         </tr>
         {% endfor %}
       </table>
-      
     </div>
   </body>
 </html>

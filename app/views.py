@@ -1,3 +1,4 @@
+from datetime import datetime
 from django.shortcuts import render, redirect
 from django.db import connection
 
@@ -23,8 +24,26 @@ def index(request):
 
 # Create your views here.
 def bbqpit(request):
-    list = {'list': [["abc", "def"]]}
-    return render(request,'app/bbqpit.html', list)
+    availtimes = []
+    curryear = 2022
+    currmonth = 2
+    currdate = 2
+    starttime = 8
+    endtime = 22
+    
+    with connection.cursor() as cursor:
+        cursor.execute("SELECT eventstartdate FROM bookings WHERE venue='BBQ Pit'")
+        fetched = cursor.fetchall()
+    
+    unavailtimes = list(sum(fetched, ()))
+    
+    for i in range(endtime - starttime):
+        startstamp = datetime(curryear, currmonth, currdate, i + starttime, 0)
+        endstamp = datetime(curryear, currmonth, currdate, i + starttime + 1, 0)
+        availtimes.append([startstamp, endstamp, startstamp in unavailtimes])
+    
+    bookings = {'available': availtimes}
+    return render(request,'app/bbqpit.html', bookings)
 
 # Create your views here.
 def view(request, id):
