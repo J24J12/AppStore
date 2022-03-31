@@ -1,48 +1,44 @@
 from datetime import datetime
 from django.shortcuts import render, redirect
 from django.db import connection
+from app.db import DB
 
 # Create your views here.
 def index(request):
     """Shows the main page"""
 
     ## Delete customer
-    if request.POST:
-        if request.POST['action'] == 'delete':
-            with connection.cursor() as cursor:
-                cursor.execute("DELETE FROM customers WHERE customerid = %s", [request.POST['id']])
+    # if request.POST:
+    #     if request.POST['action'] == 'delete':
+    #         with connection.cursor() as cursor:
+    #             cursor.execute("DELETE FROM customers WHERE customerid = %s", [request.POST['id']])
 
-    ## Use raw query to get all objects
-    with connection.cursor() as cursor:
-        cursor.execute("SELECT * FROM venues")
-        venues = cursor.fetchall()
-        print(venues)
-
-    result_dict = {'records': venues}
+    result_dict = DB().get_venues()
 
     return render(request,'app/index.html',result_dict)
 
 # Create your views here.
 def bbqpit(request):
-    availtimes = []
-    curryear = 2022
-    currmonth = 2
-    currdate = 2
-    starttime = 8
-    endtime = 22
+    # availtimes = []
+    # curryear = 2022
+    # currmonth = 2
+    # currdate = 2
+    # starttime = 8
+    # endtime = 22
     
-    with connection.cursor() as cursor:
-        cursor.execute("SELECT eventstartdate FROM bookings WHERE venue='BBQ Pit'")
-        fetched = cursor.fetchall()
+    # with connection.cursor() as cursor:
+    #     cursor.execute("SELECT eventstartdate FROM bookings WHERE venue='BBQ Pit'")
+    #     fetched = cursor.fetchall()
     
-    unavailtimes = list(sum(fetched, ()))
+    # unavailtimes = list(sum(fetched, ()))
     
-    for i in range(endtime - starttime):
-        startstamp = datetime(curryear, currmonth, currdate, i + starttime, 0)
-        endstamp = datetime(curryear, currmonth, currdate, i + starttime + 1, 0)
-        availtimes.append([startstamp, endstamp, startstamp in unavailtimes])
+    # for i in range(endtime - starttime):
+    #     startstamp = datetime(curryear, currmonth, currdate, i + starttime, 0)
+    #     endstamp = datetime(curryear, currmonth, currdate, i + starttime + 1, 0)
+    #     availtimes.append([startstamp, endstamp, startstamp in unavailtimes])
     
-    bookings = {'available': availtimes}
+    # bookings = {'available': availtimes}
+    bookings = DB().get_bbq_schedule()
     return render(request,'app/bbqpit.html', bookings)
 
 # Create your views here.
