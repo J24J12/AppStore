@@ -1,0 +1,46 @@
+{% load static %}
+<html>
+  <head>
+    <link rel="preconnect" href="https://fonts.googleapis.com" />
+    <link rel="preconnect" href="https://fonts.gstatic.com" crossorigin />
+    <link
+      href="https://fonts.googleapis.com/css2?family=Poppins:wght@300;400;600&display=swap"
+      rel="stylesheet"
+    />
+    <link rel="stylesheet" href="../../static/css/main.css" />
+  </head>
+  <body>
+    <div>
+      <img
+        src="{% static 'app/images/tenniscourt.jpeg' %}"
+        width="100%"
+        height="50%"
+        style="object-fit: cover; filter: brightness(40%)"
+        alt="tenniscourt-banner"
+      />
+      <div class="header-container">
+        <div class="header-text">Skyward Atlas</div>
+        <div class="header-body">Your one stop booking facility</div>
+      </div>
+    </div>
+    <div class="booking-header">Tennis Court Availability</div>
+    <div class="table-container">
+      <table border="1">
+        <thead>
+          <th>Timings</th>
+          <th>Availability</th>
+        </thead>
+        {% for availtimes in available %}
+        <tr>
+          <td>{{availtimes.0.time}} - {{availtimes.1.time}}</td>
+          {% if availtimes.2 %}
+          <td>Unavailable</td>
+          {% else %}
+          <td><a href="tenniscourt">Available</a></td>
+          {% endif %}
+        </tr>
+        {% endfor %}
+      </table>
+    </div>
+  </body>
+</html>

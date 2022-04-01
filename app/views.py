@@ -41,6 +41,19 @@ def bbqpit(request):
     bookings = DB().get_bbq_schedule()
     return render(request,'app/bbqpit.html', bookings)
 
+def tenniscourt(request):
+    bookings = DB().get_tenniscourt_schedule()
+    return render(request,'app/tenniscourt.html', bookings)
+
+def mph(request):
+    bookings = DB().get_mph_schedule()
+    return render(request,'app/mph.html', bookings)
+
+def tabletennis(request):
+    bookings = DB().get_tabletennis_schedule()
+    return render(request,'app/tabletennis.html', bookings)
+
+
 # Create your views here.
 def view(request, id):
     """Shows the main page"""

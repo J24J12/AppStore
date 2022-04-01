@@ -26,4 +26,8 @@ urlpatterns = [
     path('view/<str:id>', app.views.view, name='view'),
     path('edit/<str:id>', app.views.edit, name='edit'),
     path('bbqpit', app.views.bbqpit, name='bbqpit'),
+    path('tenniscourt', app.views.tenniscourt, name='tenniscourt'),
+    path('mph', app.views.mph, name='mph'),
+    path('tabletennis', app.views.tabletennis, name='tabletennis'),
+
 ]
