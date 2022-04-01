@@ -2,40 +2,108 @@ from datetime import datetime
 from django.shortcuts import render, redirect
 from django.db import connection
 from app.db import DB
+from django.http import HttpResponse
+from django.contrib.auth.models import User
+from django.contrib import messages
+from django.contrib.auth import authenticate, login, logout
 
 # Create your views here.
+def home(request):
+    return render(request, "authentication/starting_page.html")
+
+def signup(request):
+
+    if request.method == "POST":
+        residentid = request.POST['residentid']
+        fname = request.POST['fname']
+        lname = request.POST['lname']
+        email = request.POST['email']
+        pass1 = request.POST['pass1']
+        pass2 = request.POST['pass2']
+
+        if User.objects.filter(residentid=residentid):
+            messages.error(request, "residentid already exist!")
+            return redirect('home')
+
+        if User.objects.filter(email=email):
+            messages.error(request, "email already exist!")
+            return redirect('home')
+
+        if pass1 != pass2:
+            messages.error(request, 'password dont match!')
+
+        myuser = User.objects.create_user(residentid, email, pass1)
+        myuser.first_name = fname
+        myuser.last_name = lname
+
+        myuser.save()
+
+        messages.success(request, "Your Account has been successfully created.")
+
+        return redirect('signin')
+
+    return render(request, "authentication/signup.html")
+
+def signin(request):
+
+    if request.POST:
+        if request.POST['action'] == 'signin':
+            email = request.POST.get('email', False)
+            pass1 = request.POST.get('pass1', False)
+            print(email, pass1)
+            with connection.cursor() as cursor:
+                cursor.execute("SELECT residentid FROM usertable WHERE email = email")
+                user = cursor.fetchone() 
+            if user is not None:
+                
+                with connection.cursor() as cursor:
+                    cursor.execute(f"INSERT INTO activeuser VALUES ('{user[0]}')")
+                return redirect('main')
+       
+    return render(request, "authentication/signin.html")
+
+
+      
+
+
+def PassUser(request):
+    if request.method == 'POST':
+        email = request.POST.get('email', False)
+        pass1 = request.POST.get('pass1', False)
+    with connection.cursor() as cursor:
+        cursor.execute("SELECT residentid FROM usertable WHERE email = email")
+        user = cursor.fetchone() 
+    if user is not None:
+        with connection.cursor() as cursor:
+            cursor.execute(f"INSERT INTO activeuser VALUES ('{user[0]}')")
+
+    return user 
+
 def index(request):
     """Shows the main page"""
-
-    ## Delete customer
-    # if request.POST:
-    #     if request.POST['action'] == 'delete':
-    #         with connection.cursor() as cursor:
-    #             cursor.execute("DELETE FROM customers WHERE customerid = %s", [request.POST['id']])
+    if request.POST:
+        if request.POST['action'] == 'delete':
+            with connection.cursor() as cursor:
+                cursor.execute("DELETE FROM activeuser WHERE residentid = %s", [request.POST['id']])
+                return redirect("signin")
+    with connection.cursor() as cursor:
+        cursor.execute("SELECT * FROM activeuser")
+        user = cursor.fetchone()
 
     result_dict = DB().get_venues()
 
-    return render(request,'app/index.html',result_dict)
+    if user is not None:
+        result_dict["user"]=user[0]
+    print(result_dict)
+    return render(request,'app/index.html', result_dict)
+
+ 
+    
 
 # Create your views here.
 def bbqpit(request):
-    # availtimes = []
-    # curryear = 2022
-    # currmonth = 2
-    # currdate = 2
-    # starttime = 8
-    # endtime = 22
     
-    # with connection.cursor() as cursor:
-    #     cursor.execute("SELECT eventstartdate FROM bookings WHERE venue='BBQ Pit'")
-    #     fetched = cursor.fetchall()
-    
-    # unavailtimes = list(sum(fetched, ()))
-    
-    # for i in range(endtime - starttime):
-    #     startstamp = datetime(curryear, currmonth, currdate, i + starttime, 0)
-    #     endstamp = datetime(curryear, currmonth, currdate, i + starttime + 1, 0)
-    #     availtimes.append([startstamp, endstamp, startstamp in unavailtimes])
+    user = PassUser(request)
     
     # bookings = {'available': availtimes}
     bookings = DB().get_bbq_schedule()

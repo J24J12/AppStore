@@ -12,6 +12,10 @@ CREATE TABLE IF NOT EXISTS usertable (
 	isadmin BOOLEAN NOT NULL
 	);
 
+CREATE TABLE IF NOT EXISTS activeuser (
+	residentid VARCHAR(16) REFERENCES usertable(residentid)
+	);
+
 CREATE TABLE IF NOT EXISTS venues (
 	venue_name VARCHAR(64) UNIQUE NOT NULL,
 	description VARCHAR(64) NOT NULL,
