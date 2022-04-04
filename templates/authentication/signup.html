@@ -38,7 +38,7 @@
         <form action="/signup" method="post">
         {% csrf_token %}
             <label for="">Resident id</label>
-            <input type="text" id="residentid" name="residentid" placeholder="Create a residentid" Required>
+            <input type="text" id="username" name="username" placeholder="Create a residentid" Required>
             <br>
 
             <label for="">First Name</label>
@@ -61,7 +61,8 @@
             <input type="password" id="pass2" name="pass2" placeholder="Confirm your password" Required>
             <br>
 
-            <button type="submit">Sign Up</button>
+            <!-- <input type="hidden" name="id" value="username"/>  -->
+            <button type="submit" name="action" value="insert">Sign Up</button>
         </form>
         
         

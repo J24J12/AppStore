@@ -6,6 +6,7 @@ from django.http import HttpResponse
 from django.contrib.auth.models import User
 from django.contrib import messages
 from django.contrib.auth import authenticate, login, logout
+import psycopg2
 
 # Create your views here.
 def home(request):
@@ -14,14 +15,16 @@ def home(request):
 def signup(request):
 
     if request.method == "POST":
-        residentid = request.POST['residentid']
+        username = request.POST['username']
         fname = request.POST['fname']
         lname = request.POST['lname']
         email = request.POST['email']
         pass1 = request.POST['pass1']
         pass2 = request.POST['pass2']
 
-        if User.objects.filter(residentid=residentid):
+        param = [username,fname,lname,email,pass1]
+
+        if User.objects.filter(username=username):
             messages.error(request, "residentid already exist!")
             return redirect('home')
 
@@ -32,17 +35,26 @@ def signup(request):
         if pass1 != pass2:
             messages.error(request, 'password dont match!')
 
-        myuser = User.objects.create_user(residentid, email, pass1)
+        myuser = User.objects.create_user(username, email, pass1)
         myuser.first_name = fname
         myuser.last_name = lname
-
+     
         myuser.save()
 
         messages.success(request, "Your Account has been successfully created.")
 
+        with connection.cursor() as cursor:
+            sql_insert_query = """ INSERT INTO usertable (residentid, firstname, lastname, email, password) VALUES (%s,%s,%s,%s,%s) """
+
+        # executemany() to insert multiple rows
+            result = cursor.executemany(sql_insert_query, param)
+            connection.commit()
+
         return redirect('signin')
 
     return render(request, "authentication/signup.html")
+
+
 
 def signin(request):
 
@@ -108,6 +120,19 @@ def bbqpit(request):
     # bookings = {'available': availtimes}
     bookings = DB().get_bbq_schedule()
     return render(request,'app/bbqpit.html', bookings)
+
+def tenniscourt(request):
+    bookings = DB().get_tenniscourt_schedule()
+    return render(request,'app/tenniscourt.html', bookings)
+
+def mph(request):
+    bookings = DB().get_mph_schedule()
+    return render(request,'app/mph.html', bookings)
+
+def tabletennis(request):
+    bookings = DB().get_tabletennis_schedule()
+    return render(request,'app/tabletennis.html', bookings)
+
 
 # Create your views here.
 def view(request, id):
