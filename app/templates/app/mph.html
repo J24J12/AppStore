@@ -23,20 +23,65 @@
         <div class="header-body">Your one stop booking facility</div>
       </div>
     </div>
-    <div class="booking-header">Multi-Purpose Hall Availability</div>
+    <div class="booking-header">
+      Multi-Purpose Hall Availability for {{date}}
+    </div>
+    {% if error %}
+    <div style="color: rgb(161, 1, 1); text-align: center; margin-top: 1%">
+      Error occured, please try again
+    </div>
+    {% endif %}
     <div class="table-container">
       <table border="1">
         <thead>
           <th>Timings</th>
           <th>Availability</th>
         </thead>
-        {% for availtimes in available %}
+        {% for availtime in availtimes %}
         <tr>
-          <td>{{availtimes.0.time}} - {{availtimes.1.time}}</td>
-          {% if availtimes.2 %}
+          <td>{{availtime.0}}</td>
+          {% if availtime.1 == user.get_username %}
+          <td>
+            <form method="POST" style="margin: 0">
+              {% csrf_token %}
+              <input
+                type="hidden"
+                id="time"
+                name="time"
+                value="{{availtime.0}}"
+              />
+              <button
+                onclick="return confirm('Are you sure you want to cancel booking?');"
+                type="submit"
+                value="cancel"
+                name="action"
+              >
+                Cancel Booking
+              </button>
+            </form>
+          </td>
+          {% elif availtime.1 %}
           <td>Unavailable</td>
           {% else %}
-          <td><a href="mph">Available</a></td>
+          <td>
+            <form method="POST" style="margin: 0">
+              {% csrf_token %}
+              <input
+                type="hidden"
+                id="time"
+                name="time"
+                value="{{availtime.0}}"
+              />
+              <button
+                onclick="return confirm('Confirm booking?');"
+                type="submit"
+                value="book"
+                name="action"
+              >
+                Book now
+              </button>
+            </form>
+          </td>
           {% endif %}
         </tr>
         {% endfor %}

@@ -1,126 +1,210 @@
 from datetime import datetime
+from time import strptime
+from unittest import result
 from django.shortcuts import render, redirect
 from django.db import connection
 from app.db import DB
+from django.http import HttpResponse
+from django.contrib.auth.models import User
+from django.contrib.auth.decorators import login_required
+from django.contrib import messages
+from django.contrib.auth import authenticate, login, logout
+import psycopg2
 
 # Create your views here.
+def home(request):
+    return render(request, "authentication/starting_page.html")
+
+def signup(request):
+    if request.method == "POST":
+        unitno = request.POST['unitno']
+        fname = request.POST['fname']
+        lname = request.POST['lname']
+        residentid = request.POST['username']
+        pass1 = request.POST['pass1']
+        pass2 = request.POST['pass2']
+
+        param = [unitno, fname,lname,residentid,pass1]
+
+        if User.objects.filter(username=residentid):
+            return render(request, 'authentication/signup.html', {'user_exists': True})
+
+        if pass1 != pass2:
+            return render(request, 'authentication/signup.html', {'password_dont_match': True})
+
+        try:
+            if unitno == 'admin':
+                DB().create_admin(fname, lname, unitno, residentid)  
+            else:
+                DB().create_user(fname, lname, unitno, residentid)
+        except Exception as e:
+            print(e)
+            return render(request, 'authentication/signup.html', {'user_exists': True})
+        myuser = User.objects.create_user(username=residentid, password=pass1)
+        myuser.first_name = fname
+        myuser.last_name = lname
+     
+        myuser.save()
+        login(request, myuser)
+
+        # with connection.cursor() as cursor:
+        #     sql_insert_query = """ INSERT INTO usertable (residentid, firstname, lastname, email, password) VALUES (%s,%s,%s,%s,%s) """
+        #     result = cursor.execute(sql_insert_query, param)
+        #     connection.commit()
+        #     print(result)
+
+        return redirect('main')
+    return render(request, "authentication/signup.html")
+
+def signin(request):
+    if request.POST:
+        if request.POST['action'] == 'signin':
+            email = request.POST.get('username', False)
+            pass1 = request.POST.get('pass1', False)
+            print(email, pass1)
+            curr_user = authenticate(username=email, password=pass1)
+            if curr_user is not None:
+                login(request, curr_user)
+            else:
+                return render(request, 'authentication/signin.html', {'not_found': True})
+            # with connection.cursor() as cursor:
+            #     cursor.execute("SELECT residentid FROM usertable WHERE email = email")
+            #     user = cursor.fetchone() 
+            # if user is not None:
+                
+            #     with connection.cursor() as cursor:
+            #         cursor.execute(f"INSERT INTO activeuser VALUES ('{user[0]}')")
+            return redirect('main')
+       
+    return render(request, "authentication/signin.html")
+
+# def PassUser(request):
+#     if request.method == 'POST':
+#         email = request.POST.get('email', False)
+#         pass1 = request.POST.get('pass1', False)
+#     with connection.cursor() as cursor:
+#         cursor.execute("SELECT residentid FROM usertable WHERE email = email")
+#         user = cursor.fetchone() 
+#     if user is not None:
+#         with connection.cursor() as cursor:
+#             cursor.execute(f"INSERT INTO activeuser VALUES ('{user[0]}')")
+
+#     return user 
+
+@login_required
 def index(request):
     """Shows the main page"""
-
-    ## Delete customer
-    # if request.POST:
-    #     if request.POST['action'] == 'delete':
-    #         with connection.cursor() as cursor:
-    #             cursor.execute("DELETE FROM customers WHERE customerid = %s", [request.POST['id']])
+    if request.POST:
+        if request.POST['action'] == 'delete':
+            logout(request)
+            return redirect("main")
+            # with connection.cursor() as cursor:
+            #     cursor.execute("DELETE FROM activeuser WHERE residentid = %s", [request.POST['id']])
+            #     return redirect("signin")
+    # with connection.cursor() as cursor:
+    #     cursor.execute("SELECT * FROM activeuser")
+    #     user = cursor.fetchone()
 
     result_dict = DB().get_venues()
+    # result_dict["user"] = request.user
+    # if user is not None:
+    #     result_dict["user"]=user[0]
+    result_dict['is_admin'] = DB().check_admin(request.user.username)
+    return render(request,'app/index.html', result_dict)
 
-    return render(request,'app/index.html',result_dict)
-
-# Create your views here.
+@login_required
 def bbqpit(request):
-    # availtimes = []
-    # curryear = 2022
-    # currmonth = 2
-    # currdate = 2
-    # starttime = 8
-    # endtime = 22
-    
-    # with connection.cursor() as cursor:
-    #     cursor.execute("SELECT eventstartdate FROM bookings WHERE venue='BBQ Pit'")
-    #     fetched = cursor.fetchall()
-    
-    # unavailtimes = list(sum(fetched, ()))
-    
-    # for i in range(endtime - starttime):
-    #     startstamp = datetime(curryear, currmonth, currdate, i + starttime, 0)
-    #     endstamp = datetime(curryear, currmonth, currdate, i + starttime + 1, 0)
-    #     availtimes.append([startstamp, endstamp, startstamp in unavailtimes])
-    
-    # bookings = {'available': availtimes}
+    error = False
+    if request.method == "POST":
+        starttime = request.POST.get('time', False)
+        if request.POST['action'] == 'cancel':
+            try:
+                DB().delete_entry(starttime, 'BBQ Pit')
+            except Exception as e:
+                error = True
+                print(e)
+        if request.POST['action'] == 'book':
+            try:
+                print(request.user.username)
+                DB().create_entry(starttime, 'BBQ Pit', request.user.username)
+            except Exception as e:
+                error = True
+                print(e)
     bookings = DB().get_bbq_schedule()
-    return render(request,'app/bbqpit.html', bookings)
+    bookings['error'] = error
+    bookings['venues'] = ['BBQ Pit', 'bbqpit']
+    bookings['is_admin'] = DB().check_admin(request.user.username)
+    return render(request,'app/booking.html', bookings)
 
+@login_required
 def tenniscourt(request):
+    error = False
+    if request.method == "POST":
+        starttime = request.POST.get('time', False)
+        if request.POST['action'] == 'cancel':
+            try:
+                DB().delete_entry(starttime, 'Tennis Court')
+            except Exception:
+                error = True
+        if request.POST['action'] == 'book':
+            try:
+                DB().create_entry(starttime, 'Tennis Court', request.user.username)
+            except Exception:
+                error = True
     bookings = DB().get_tenniscourt_schedule()
-    return render(request,'app/tenniscourt.html', bookings)
+    bookings['error'] = error
+    bookings['venues'] = ['Tennis Court', 'tenniscourt']
+    bookings['is_admin'] = DB().check_admin(request.user.username)
+    return render(request,'app/booking.html', bookings)
 
-def mph(request):
+@login_required
+def mph(request): 
+    error = False
+    if request.method == "POST":
+        starttime = request.POST.get('time', False)
+        if request.POST['action'] == 'cancel':
+            try:
+                DB().delete_entry(starttime, 'Multi-Purpose Hall')
+            except Exception:
+                error = True
+        if request.POST['action'] == 'book':
+            try:
+                DB().create_entry(starttime, 'Multi-Purpose Hall', request.user.username)
+            except Exception:
+                error = True
     bookings = DB().get_mph_schedule()
-    return render(request,'app/mph.html', bookings)
+    bookings['error'] = error
+    bookings['venues'] = ['Multi-Purpose Hall', 'mph']
+    bookings['is_admin'] = DB().check_admin(request.user.username)
+    return render(request,'app/booking.html', bookings)
 
+@login_required
 def tabletennis(request):
+    error = False
+    if request.method == "POST":
+        starttime = request.POST.get('time', False)
+        if request.POST['action'] == 'cancel':
+            try:
+                DB().delete_entry(starttime, 'Table Tennis')
+            except Exception:
+                error = True
+        if request.POST['action'] == 'book':
+            try:
+                DB().create_entry(starttime, 'Table Tennis', request.user.username)
+            except Exception:
+                error = True
     bookings = DB().get_tabletennis_schedule()
-    return render(request,'app/tabletennis.html', bookings)
+    bookings['error'] = error
+    bookings['venues'] = ['Table Tennis', 'tabletennis']
+    bookings['is_admin'] = DB().check_admin(request.user.username)
+    return render(request,'app/booking.html', bookings)
 
-
-# Create your views here.
-def view(request, id):
-    """Shows the main page"""
-    
-    ## Use raw query to get a customer
-    with connection.cursor() as cursor:
-        cursor.execute("SELECT * FROM customers WHERE customerid = %s", [id])
-        customer = cursor.fetchone()
-    result_dict = {'cust': customer}
-
-    return render(request,'app/view.html',result_dict)
-
-# Create your views here.
-def add(request):
-    """Shows the main page"""
-    context = {}
-    status = ''
-
-    if request.POST:
-        ## Check if customerid is already in the table
-        with connection.cursor() as cursor:
-
-            cursor.execute("SELECT * FROM customers WHERE customerid = %s", [request.POST['customerid']])
-            customer = cursor.fetchone()
-            ## No customer with same id
-            if customer == None:
-                ##TODO: date validation
-                cursor.execute("INSERT INTO customers VALUES (%s, %s, %s, %s, %s, %s, %s)"
-                        , [request.POST['first_name'], request.POST['last_name'], request.POST['email'],
-                           request.POST['dob'] , request.POST['since'], request.POST['customerid'], request.POST['country'] ])
-                return redirect('index')    
-            else:
-                status = 'Customer with ID %s already exists' % (request.POST['customerid'])
-
-
-    context['status'] = status
- 
-    return render(request, "app/add.html", context)
-
-# Create your views here.
-def edit(request, id):
-    """Shows the main page"""
-
-    # dictionary for initial data with
-    # field names as keys
-    context ={}
-
-    # fetch the object related to passed id
-    with connection.cursor() as cursor:
-        cursor.execute("SELECT * FROM customers WHERE customerid = %s", [id])
-        obj = cursor.fetchone()
-
-    status = ''
-    # save the data from the form
-
-    if request.POST:
-        ##TODO: date validation
-        with connection.cursor() as cursor:
-            cursor.execute("UPDATE customers SET first_name = %s, last_name = %s, email = %s, dob = %s, since = %s, country = %s WHERE customerid = %s"
-                    , [request.POST['first_name'], request.POST['last_name'], request.POST['email'],
-                        request.POST['dob'] , request.POST['since'], request.POST['country'], id ])
-            status = 'Customer edited successfully!'
-            cursor.execute("SELECT * FROM customers WHERE customerid = %s", [id])
-            obj = cursor.fetchone()
-
-
-    context["obj"] = obj
-    context["status"] = status
- 
-    return render(request, "app/edit.html", context)
+@login_required
+def analytics(request):
+    result_dict = {}
+    result_dict['booking_count'] = DB().get_booking_count()
+    result_dict['least_booked'] = DB().get_least_booked()
+    result_dict['most_booked'] = DB().get_most_booked()
+    result_dict['is_admin'] = DB().check_admin(request.user.username)
+    result_dict['most_resident'] = DB().get_most_booked_resident()
+    return render(request, 'app/analytics.html', result_dict)
