@@ -116,6 +116,10 @@ def index(request):
 def bbqpit(request):
     error = False
     if request.method == "POST":
+        if request.POST['action'] == 'delete':
+            print('logout')
+            logout(request)
+            return redirect("main")
         starttime = request.POST.get('time', False)
         if request.POST['action'] == 'cancel':
             try:
@@ -140,6 +144,9 @@ def bbqpit(request):
 def tenniscourt(request):
     error = False
     if request.method == "POST":
+        if request.POST['action'] == 'delete':
+            logout(request)
+            return redirect("main")
         starttime = request.POST.get('time', False)
         if request.POST['action'] == 'cancel':
             try:
@@ -161,6 +168,9 @@ def tenniscourt(request):
 def mph(request): 
     error = False
     if request.method == "POST":
+        if request.POST['action'] == 'delete':
+            logout(request)
+            return redirect("main")
         starttime = request.POST.get('time', False)
         if request.POST['action'] == 'cancel':
             try:
@@ -182,6 +192,9 @@ def mph(request):
 def tabletennis(request):
     error = False
     if request.method == "POST":
+        if request.POST['action'] == 'delete':
+            logout(request)
+            return redirect("main")
         starttime = request.POST.get('time', False)
         if request.POST['action'] == 'cancel':
             try:
@@ -201,6 +214,10 @@ def tabletennis(request):
 
 @login_required
 def analytics(request):
+    if request.method == "POST":
+        if request.POST['action'] == 'delete':
+            logout(request)
+            return redirect("main")
     result_dict = {}
     result_dict['booking_count'] = DB().get_booking_count()
     result_dict['least_booked'] = DB().get_least_booked()
