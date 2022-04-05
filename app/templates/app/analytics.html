@@ -28,7 +28,7 @@
       </a>
       {% if is_admin %}
       <a
-        href="analytics"
+        href="main"
         class="options-btn"
         >
           Analytics
@@ -55,39 +55,56 @@
     </div>
   </a>
     <br />
-    <!-- <form method="POST">
-      {% csrf_token %}
-      <input type="hidden" name="id" value="{{user}}" />
-      <button
-        onclick="return confirm('Are you sure you want to sign out');"
-        type="submit"
-        name="action"
-        value="delete"
-      >
-        Sign Out
-      </button>
-    </form> -->
-    <div class="booking-header">Select your venue</div>
-    <div class="booking-container">
-      {% for venues in records %}
-      <a href="{{venues.2}}" style="text-decoration: none; color: black">
-        <div class="booking-box">
-          {% with 'app/images/'|add:venues.2|add:'.jpeg' as image_static %}
-          <img
-            src="{% static image_static %}"
-            width="100%"
-            height="65%"
-            style="object-fit: cover"
-            alt="{{venues.2}}"
-          />
-          {% endwith %}
-          <div class="booking-text">
-            <p class="booking-venue">{{venues.0}}</p>
-            <p class="booking-description">{{venues.1}}</p>
-          </div>
-        </div>
-      </a>
+    <div class="booking-header">Booking Overview</div>
+    <br />
+    <table border="1" style="width: 30%" class="center">
+      <thead>
+        <th colspan="2">Booking Count by Venue</th>
+      </thead>
+      {% for venue in booking_count %}
+      <tr>
+        <td>{{venue.0}}</td>
+        <td style="width: 20%">{{venue.1}}</td>
+      </tr>
       {% endfor %}
-    </div>
+    </table>
+    <br />
+    <table border="1" style="width: 30%" class="center">
+      <thead>
+        <th colspan="2">Least Booked Venue</th>
+      </thead>
+      {% for venue in least_booked %}
+      <tr>
+        <td>{{venue.0}}</td>
+        <td style="width: 20%">{{venue.1}}</td>
+      </tr>
+      {% endfor %}
+    </table>
+    <br />
+    <table border="1" style="width: 30%" class="center">
+      <thead>
+        <th colspan="2">Most Booked Venue</th>
+      </thead>
+      {% for venue in most_booked %}
+      <tr>
+        <td>{{venue.0}}</td>
+        <td style="width: 20%">{{venue.1}}</td>
+      </tr>
+      {% endfor %}
+    </table>
+    <br />
+    <table border="1" style="width: 30%" class="center">
+      <thead>
+        <th colspan="3">Resident with Most Bookings</th>
+      </thead>
+      {% for resident in most_resident %}
+      <tr>
+        <td>{{resident.0}} {{resident.1}}</td>
+        <td style="width: 30%;">#{{resident.2}}</td>
+        <td style="width: 20%">{{resident.3}}</td>
+      </tr>
+      {% endfor %}
+    </table>
+    <br />
   </body>
 </html>
