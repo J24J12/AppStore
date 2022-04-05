@@ -219,9 +219,12 @@ def analytics(request):
             logout(request)
             return redirect("main")
     result_dict = {}
+    result_dict['latest_user'] = DB().get_latest_created_user()
     result_dict['booking_count'] = DB().get_booking_count()
     result_dict['least_booked'] = DB().get_least_booked()
     result_dict['most_booked'] = DB().get_most_booked()
     result_dict['is_admin'] = DB().check_admin(request.user.username)
     result_dict['most_resident'] = DB().get_most_booked_resident()
+    if not result_dict['is_admin']:
+        return redirect("main")
     return render(request, 'app/analytics.html', result_dict)

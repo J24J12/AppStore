@@ -57,51 +57,86 @@
     <br />
     <div class="booking-header">Booking Overview</div>
     <br />
-    <table border="1" style="width: 30%" class="center">
+    <table border="1" style="width: 60%" class="center">
       <thead>
         <th colspan="2">Booking Count by Venue</th>
+      </thead>
+      <thead>
+        <th>Venue</th>
+        <th style="width: 50%">No. of Bookings</th>
       </thead>
       {% for venue in booking_count %}
       <tr>
         <td>{{venue.0}}</td>
-        <td style="width: 20%">{{venue.1}}</td>
+        <td>{{venue.1}}</td>
       </tr>
       {% endfor %}
     </table>
     <br />
-    <table border="1" style="width: 30%" class="center">
+    <table border="1" style="width: 60%" class="center">
       <thead>
         <th colspan="2">Least Booked Venue</th>
+      </thead>
+      <thead>
+        <th>Venue</th>
+        <th style="width: 50%">No. of Bookings</th>
       </thead>
       {% for venue in least_booked %}
       <tr>
         <td>{{venue.0}}</td>
-        <td style="width: 20%">{{venue.1}}</td>
+        <td>{{venue.1}}</td>
       </tr>
       {% endfor %}
     </table>
     <br />
-    <table border="1" style="width: 30%" class="center">
+    <table border="1" style="width: 60%" class="center">
       <thead>
         <th colspan="2">Most Booked Venue</th>
+      </thead>
+      <thead>
+        <th>Venue</th>
+        <th style="width: 50%">No. of Bookings</th>
       </thead>
       {% for venue in most_booked %}
       <tr>
         <td>{{venue.0}}</td>
-        <td style="width: 20%">{{venue.1}}</td>
+        <td>{{venue.1}}</td>
       </tr>
       {% endfor %}
     </table>
     <br />
-    <table border="1" style="width: 30%" class="center">
+    <table border="1" style="width: 60%" class="center">
       <thead>
         <th colspan="3">Resident with Most Bookings</th>
+      </thead>
+      <thead>
+        <th>Full Name</th>
+        <th style="width: 33%;">Unit No.</th>
+        <th style="width: 23%">No. of Bookings</th>
       </thead>
       {% for resident in most_resident %}
       <tr>
         <td>{{resident.0}} {{resident.1}}</td>
-        <td style="width: 30%;">#{{resident.2}}</td>
-        <td style="width: 20%">{{resident.3}}</td>
+        <td>#{{resident.2}}</td>
+        <td>{{resident.3}}</td>
+      </tr>
+      {% endfor %}
+    </table>
+    <br />
+    <table border="1" style="width: 60%" class="center">
+      <thead>
+        <th colspan="3">Last Created User (incl. admins)</th>
+      </thead>
+      <thead>
+        <th>Full Name</th>
+        <th style="width: 33%;">Resident ID</th>
+        <th style="width: 33%;">Unit No.</th>
+      </thead>
+      {% for user in latest_user %}
+      <tr>
+        <td>{{user.1}} {{user.2}}</td>
+        <td>{{user.3}}</td>
+        <td>#{{user.0}}</td>
       </tr>
       {% endfor %}
     </table>

@@ -151,4 +151,10 @@ class DB:
                 GROUP BY b2.residentid);""")
         fetched = self.cursor.fetchall()
         return fetched
+    
+    def get_latest_created_user(self):
+        self.cursor.execute("SELECT * FROM latest_created_user")
+        fetched = self.cursor.fetchall()
+        print(fetched)
+        return fetched
 

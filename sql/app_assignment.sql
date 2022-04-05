@@ -1,6 +1,7 @@
-DROP VIEW IF EXISTS venueavailtime;
+DROP VIEW IF EXISTS venueavailtimes;
 DROP TABLE IF EXISTS bookings;
 DROP TABLE IF EXISTS usertable;
+DROP TABLE IF EXISTS latest_created_user;
 DROP TABLE IF EXISTS venues;
 DROP TABLE IF EXISTS unit;
 DROP TABLE IF EXISTS availtimes;
@@ -29,6 +30,30 @@ CREATE TABLE IF NOT EXISTS bookings (
 
 CREATE TABLE IF NOT EXISTS availtimes (
 	starttime TIME NOT NULL CHECK (starttime >= '08:00:00' AND starttime <= '22:00:00'));
+
+CREATE TABLE IF NOT EXISTS latest_created_user (
+	unitnumber VARCHAR(64) REFERENCES unit(unitnumber) ON UPDATE CASCADE ON DELETE CASCADE DEFERRABLE INITIALLY DEFERRED,
+	firstname VARCHAR(64) NOT NULL,
+	lastname VARCHAR(64) NOT NULL,
+	residentid VARCHAR(64) PRIMARY KEY);
+	
+CREATE OR REPLACE FUNCTION clear_and_insert_latest_user()
+	RETURNS trigger AS
+$$
+BEGIN
+	DELETE FROM latest_created_user;
+	INSERT INTO latest_created_user VALUES (NEW.unitnumber, NEW.firstname, NEW.lastname, NEW.residentid);
+RETURN NEW;
+END;
+$$
+LANGUAGE 'plpgsql';
+
+CREATE OR REPLACE TRIGGER user_create_trigger
+	AFTER INSERT
+	ON usertable
+	FOR EACH ROW
+	EXECUTE PROCEDURE clear_and_insert_latest_user();
+
 	
 INSERT INTO venues VALUES ('BBQ Pit', 'BBQ', 'bbqpit');
 INSERT INTO venues VALUES ('Tennis Court', 'Tennis', 'tenniscourt');
