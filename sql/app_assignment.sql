@@ -1,3 +1,4 @@
+DROP VIEW IF EXISTS venueavailtime;
 DROP TABLE IF EXISTS bookings;
 DROP TABLE IF EXISTS usertable;
 DROP TABLE IF EXISTS venues;
