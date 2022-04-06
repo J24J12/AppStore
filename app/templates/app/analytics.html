@@ -112,13 +112,29 @@
       <thead>
         <th>Full Name</th>
         <th style="width: 33%;">Unit No.</th>
-        <th style="width: 23%">No. of Bookings</th>
+        <th style="width: 33%">No. of Bookings</th>
       </thead>
       {% for resident in most_resident %}
       <tr>
         <td>{{resident.0}} {{resident.1}}</td>
         <td>#{{resident.2}}</td>
         <td>{{resident.3}}</td>
+      </tr>
+      {% endfor %}
+    </table>
+    <br />
+    <table border="1" style="width: 60%" class="center">
+      <thead>
+        <th colspan="2">Resident with no Bookings</th>
+      </thead>
+      <thead>
+        <th>Full Name</th>
+        <th style="width: 50%;">Unit No.</th>
+      </thead>
+      {% for resident in never_booked_resident %}
+      <tr>
+        <td>{{resident.0}} {{resident.1}}</td>
+        <td>#{{resident.2}}</td>
       </tr>
       {% endfor %}
     </table>

@@ -225,6 +225,7 @@ def analytics(request):
     result_dict['most_booked'] = DB().get_most_booked()
     result_dict['is_admin'] = DB().check_admin(request.user.username)
     result_dict['most_resident'] = DB().get_most_booked_resident()
+    result_dict['never_booked_resident'] = DB().never_booked_resident()
     if not result_dict['is_admin']:
         return redirect("main")
     return render(request, 'app/analytics.html', result_dict)

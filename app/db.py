@@ -98,63 +98,66 @@ class DB:
         return {'availtimes': availtimes, 'date': date.today()}
     
     def get_booking_count(self):
-        self.cursor.execute("""SELECT v.venue_name, COUNT(*)
-            FROM venues v, bookings b, usertable ut
-            WHERE v.venue_name = b.venue
-            AND b.residentid = ut.residentid
-            AND ut.isadmin = 'False'
-            GROUP BY v.venue_name
-            ORDER BY COUNT(*) DESC""")
+        self.cursor.execute("""SELECT v.venue_name, COUNT(b.venue) 
+            FROM venues v LEFT OUTER JOIN bookings b ON v.venue_name = b.venue 
+            GROUP BY v.venue_name, b.venue 
+            ORDER BY COUNT(b.venue) DESC;""")
         fetched = self.cursor.fetchall()
         return fetched
     
     def get_least_booked(self):
-        self.cursor.execute("""SELECT b1.venue, COUNT(*)
-            FROM bookings b1, usertable ut
-            WHERE b1.residentid = ut.residentid
-            AND ut.isadmin = 'False'
-            GROUP BY venue
-            HAVING COUNT(*) <= ALL(
-                SELECT COUNT(*)
-                FROM bookings b2
-                GROUP BY VENUE);""")
+        self.cursor.execute("""SELECT v1.venue_name, COUNT(b1.venue) 
+            FROM venues v1 LEFT OUTER JOIN bookings b1 ON v1.venue_name = b1.venue 
+            GROUP BY v1.venue_name, b1.venue 
+            HAVING COUNT(b1.venue) <= ALL( 
+                SELECT COUNT(b2.venue) 
+                FROM venues v2 LEFT OUTER JOIN bookings b2 ON v2.venue_name = b2.venue 
+                GROUP BY v2.venue_name, b2.venue); 
+                """)
         fetched = self.cursor.fetchall()
         return fetched
     
     def get_most_booked(self):
-        self.cursor.execute("""SELECT b1.venue, COUNT(*)
-            FROM bookings b1, usertable ut
-            WHERE b1.residentid = ut.residentid
-            AND ut.isadmin = 'False'
-            GROUP BY venue
-            HAVING COUNT(*) >= ALL(
-                SELECT COUNT(*)
-                FROM bookings b2, usertable ut1
-                WHERE b2.residentid = ut1.residentid
-                AND ut1.isadmin = 'False'
-                GROUP BY VENUE);""")
+        self.cursor.execute("""SELECT v1.venue_name, COUNT(b1.venue) 
+            FROM venues v1 LEFT OUTER JOIN bookings b1 ON v1.venue_name = b1.venue 
+            GROUP BY v1.venue_name
+            HAVING COUNT(b1.venue) >= ALL( 
+                SELECT COUNT(b2.venue) 
+                FROM venues v2 LEFT OUTER JOIN bookings b2 ON v2.venue_name = b2.venue 
+                GROUP BY v2.venue_name); 
+                """)
         fetched = self.cursor.fetchall()
         return fetched
     
     def get_most_booked_resident(self):
-        self.cursor.execute("""SELECT ut.firstname, ut.lastname, u.unitnumber, COUNT(*)
-            FROM unit u, usertable ut, bookings b1
-            WHERE u.unitnumber = ut.unitnumber
-            AND ut.residentid = b1.residentid
-            AND ut.isadmin = 'False'
-            GROUP BY ut.firstname, ut.lastname, u.unitnumber
-            HAVING COUNT(*) >= ALL(
-                SELECT COUNT(*)
-                FROM bookings b2, usertable ut1
-                WHERE b2.residentid = ut1.residentid
-                AND ut1.isadmin = 'False'
-                GROUP BY b2.residentid);""")
+        self.cursor.execute("""SELECT ut1.firstname, ut1.lastname, u.unitnumber, COUNT(*)
+            FROM unit u, usertable ut1, bookings b1 
+            WHERE u.unitnumber = ut1.unitnumber 
+            AND ut1.residentid = b1.residentid 
+            GROUP BY ut1.firstname, ut1.lastname, u.unitnumber 
+            HAVING COUNT(*) >= ALL( 
+                SELECT COUNT(*) 
+                FROM bookings b2, usertable ut2 
+                WHERE b2.residentid = ut2.residentid 
+                AND ut2.isadmin = 'False' 
+                GROUP BY b2.residentid); """)
+        fetched = self.cursor.fetchall()
+        return fetched
+    
+    def never_booked_resident(self):
+        self.cursor.execute("""SELECT ut1.firstname, ut1.lastname, u.unitnumber 
+            FROM unit u, usertable ut1 
+            WHERE u.unitnumber = ut1.unitnumber 
+            AND ut1.isadmin = 'False' 
+            AND u.unitnumber NOT IN ( 
+                SELECT ut2.unitnumber 
+                FROM usertable ut2, bookings b 
+                WHERE ut2.residentid = b.residentid);""")
         fetched = self.cursor.fetchall()
         return fetched
     
     def get_latest_created_user(self):
         self.cursor.execute("SELECT * FROM latest_created_user")
         fetched = self.cursor.fetchall()
-        print(fetched)
         return fetched
 
