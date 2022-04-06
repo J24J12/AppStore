@@ -134,6 +134,7 @@ class DB:
             FROM unit u, usertable ut1, bookings b1 
             WHERE u.unitnumber = ut1.unitnumber 
             AND ut1.residentid = b1.residentid 
+            AND ut1.isadmin = 'False'
             GROUP BY ut1.firstname, ut1.lastname, u.unitnumber 
             HAVING COUNT(*) >= ALL( 
                 SELECT COUNT(*) 
