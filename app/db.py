@@ -108,11 +108,11 @@ class DB:
     def get_least_booked(self):
         self.cursor.execute("""SELECT v1.venue_name, COUNT(b1.venue) 
             FROM venues v1 LEFT OUTER JOIN bookings b1 ON v1.venue_name = b1.venue 
-            GROUP BY v1.venue_name, b1.venue 
+            GROUP BY v1.venue_name
             HAVING COUNT(b1.venue) <= ALL( 
                 SELECT COUNT(b2.venue) 
                 FROM venues v2 LEFT OUTER JOIN bookings b2 ON v2.venue_name = b2.venue 
-                GROUP BY v2.venue_name, b2.venue); 
+                GROUP BY v2.venue_name); 
                 """)
         fetched = self.cursor.fetchall()
         return fetched
